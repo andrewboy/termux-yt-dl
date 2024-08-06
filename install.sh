@@ -13,7 +13,7 @@ yes | pkg update && pkg upgrade
 
 #Install dependencies
 pkg install curl python python-pip ffmpeg dialog -y
-yes | pip install yt-dlp
+yes | pip install -U yt-dlp
 
 #Install script
 mkdir -p $bin_path
