@@ -22,6 +22,8 @@ exitcode=$?;
 #create directory if not exists
 [ ! -d "$download_path" ] && mkdir "$download_path"
 
+clear
+
 if [ "$result" == 1 ]; then
   yt-dlp -c -i "$url" -o "$download_path/$file_name"
 elif [ "$result" == 2 ]; then
