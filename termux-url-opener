@@ -2,6 +2,7 @@
 
 clear
 url=$1
+github_url="https://github.com/andrewboy/termux-yt-dl/raw/main"
 download_path="$HOME/storage/downloads/youtube-dl"
 file_name="%(title)s.%(ext)s"
 
@@ -10,10 +11,11 @@ result=$(dialog \
 --stdout \
 --backtitle "Youtube Downloader" \
 --title "Youtube Downloader" \
---menu "Choose format:" \
-9 40 4 \
-1 "video" \
-2 "audio");
+--menu "Choose:" \
+10 40 4 \
+1 "download video" \
+2 "download audio" \
+3 "update");
 
 exitcode=$?;
 
@@ -24,6 +26,8 @@ if [ "$result" == 1 ]; then
   yt-dlp -c -i "$url" -o "$download_path/$file_name"
 elif [ "$result" == 2 ]; then
   yt-dlp -x --audio-format "mp3" -c -i "$url" -o "$download_path/$file_name"
+elif [ "$result" == 3 ]; then
+  curl -sSL "$github_url/install.sh" | bash
 else
   echo "Unrecognized choice"
 fi
