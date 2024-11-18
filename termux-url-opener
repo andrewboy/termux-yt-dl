@@ -1,12 +1,13 @@
 #!/bin/bash
 
+url=$1
+github_url="https://github.com/andrewboy/termux-yt-dl/raw/main"
+download_path="$HOME/storage/downloads/youtube-dl"
+file_name="%(title)s.%(ext)s"
+
 video_menu() {
   clear
 
-  url=$1
-  github_url="https://github.com/andrewboy/termux-yt-dl/raw/main"
-  download_path="$HOME/storage/downloads/youtube-dl"
-  file_name="%(title)s.%(ext)s"
 
   result=$(dialog \
   --clear \
@@ -37,6 +38,7 @@ video_menu() {
     else
       withSubs=""
     fi
+    clear
     yt-dlp "$withSubs" -c -i "$url" -o "$download_path/$file_name"
   elif [ "$result" == 2 ]; then
     yt-dlp -x --audio-format "mp3" -c -i "$url" -o "$download_path/$file_name"
