@@ -1,35 +1,51 @@
 #!/bin/bash
 
-clear
-url=$1
-github_url="https://github.com/andrewboy/termux-yt-dl/raw/main"
-download_path="$HOME/storage/downloads/youtube-dl"
-file_name="%(title)s.%(ext)s"
+video_menu() {
+  clear
 
-result=$(dialog \
---clear \
---stdout \
---backtitle "Youtube Downloader" \
---title "Youtube Downloader" \
---menu "Choose:" \
-10 40 4 \
-1 "download video" \
-2 "download audio" \
-3 "update");
+  url=$1
+  github_url="https://github.com/andrewboy/termux-yt-dl/raw/main"
+  download_path="$HOME/storage/downloads/youtube-dl"
+  file_name="%(title)s.%(ext)s"
 
-exitcode=$?;
+  result=$(dialog \
+  --clear \
+  --stdout \
+  --backtitle "Video Downloader" \
+  --title "Video Downloader" \
+  --menu "Choose:" \
+  10 40 4 \
+  1 "download video" \
+  2 "download audio" \
+  3 "update");
 
-#create directory if not exists
-[ ! -d "$download_path" ] && mkdir "$download_path"
+  exitCode=$?
 
-clear
+  clear
 
-if [ "$result" == 1 ]; then
-  yt-dlp -c -i "$url" -o "$download_path/$file_name"
-elif [ "$result" == 2 ]; then
-  yt-dlp -x --audio-format "mp3" -c -i "$url" -o "$download_path/$file_name"
-elif [ "$result" == 3 ]; then
-  curl -sSL "$github_url/install.sh" | bash
-else
-  echo "Unrecognized choice"
-fi
+  [ "$exitCode" == 1 ] && exit 0
+
+  #create directory if not exists
+  [ ! -d "$download_path" ] && mkdir "$download_path"
+
+  if [ "$result" == 1 ]; then
+    dialog \
+      --yesno "Do you want to download the subtitle too?" \
+      0 0
+    if [ "$?" == 0 ]; then
+      withSubs="--write-sub --write-auto-sub --sub-lang \"en.*\""
+    else
+      withSubs=""
+    fi
+    yt-dlp "$withSubs" -c -i "$url" -o "$download_path/$file_name"
+  elif [ "$result" == 2 ]; then
+    yt-dlp -x --audio-format "mp3" -c -i "$url" -o "$download_path/$file_name"
+  elif [ "$result" == 3 ]; then
+    curl -sSL "$github_url/install.sh" | bash
+    video_menu
+  else
+    echo "Unrecognized choice"
+  fi
+}
+
+video_menu
