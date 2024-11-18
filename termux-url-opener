@@ -31,15 +31,16 @@ video_menu() {
 
   if [ "$result" == 1 ]; then
     dialog \
-      --yesno "Do you want to download the subtitle too?" \
+      --yesno "Do you want to download the subtitle too(English)?" \
       0 0
     if [ "$?" == 0 ]; then
-      withSubs="--write-sub --write-auto-sub --sub-lang \"en.*\""
+      withSubs="--write-sub --write-auto-sub"
+      #--sub-lang \"en.*\"
     else
       withSubs=""
     fi
     clear
-    yt-dlp "$withSubs" -c -i "$url" -o "$download_path/$file_name"
+    yt-dlp ${withSubs} -c -i "$url" -o "$download_path/$file_name"
   elif [ "$result" == 2 ]; then
     yt-dlp -x --audio-format "mp3" -c -i "$url" -o "$download_path/$file_name"
   elif [ "$result" == 3 ]; then
