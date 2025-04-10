@@ -3,9 +3,9 @@
 # INIT =========================================================================
 
 fetch_cp() {
-    local github_url = $1
-    local src = $2
-    local dest = $3
+    local github_url=$1
+    local src=$2
+    local dest=$3
 
     if ! [ -f $src ];
     then
