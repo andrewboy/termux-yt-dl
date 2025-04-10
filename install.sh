@@ -20,7 +20,8 @@ bin_path="$HOME/bin"
 file_name="termux-url-opener"
 
 # Update packages
-yes | pkg update && pkg upgrade
+yes | pkg update && \
+yes | pkg upgrade
 
 # TERMUX URL OPENER ============================================================
 
