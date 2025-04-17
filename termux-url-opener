@@ -3,13 +3,14 @@
 url=$1
 github_url="https://github.com/andrewboy/termux-yt-dl/raw/main"
 download_path="$HOME/storage/downloads/youtube-dl"
-file_name="%(title)s.%(ext)s"
+# download_path="$PWD"
+output_path="$download_path/%(title)s.%(ext)s"
+chapters_output_path="chapter:$download_path/%(title)s/[%(section_number)s] - %(section_title)s.%(ext)s"
 
 video_menu() {
   clear
 
-
-  result=$(dialog \
+  local result=$(dialog \
   --clear \
   --stdout \
   --backtitle "Video Downloader" \
@@ -20,7 +21,7 @@ video_menu() {
   2 "download audio" \
   3 "update");
 
-  exitCode=$?
+  local exitCode=$?
 
   clear
 
@@ -30,19 +31,53 @@ video_menu() {
   [ ! -d "$download_path" ] && mkdir "$download_path"
 
   if [ "$result" == 1 ]; then
-    dialog \
-      --yesno "Do you want to download the subtitle too(English)?" \
-      0 0
-    if [ "$?" == 0 ]; then
-      withSubs="--write-sub --write-auto-sub"
-      #--sub-lang \"en.*\"
-    else
-      withSubs=""
-    fi
+    local checklist_result=$(dialog \
+      --checklist \
+      "Select choices" 0 0 2 \
+      a "With subtitle" off \
+      b "Split chapters" off \
+      --output-fd 1);
+
     clear
-    yt-dlp ${withSubs} -c -i "$url" -o "$download_path/$file_name"
+
+    if [ "$?" == 1 ]; then
+      video_menu
+
+      return 1 # or return 0, or even you can omit the argument.
+    fi
+
+    local video_params=" -c -i"
+
+    # echo $checklist_result
+
+    if [[ $checklist_result =~ "a" ]]; then
+      video_params+=" --write-sub --write-auto-sub"
+    fi
+
+    video_params+=" $url"
+
+    if [[ $checklist_result =~ "b" ]]; then
+      video_params+=" --split-chapters"
+
+      yt-dlp $video_params -o "$chapters_output_path"
+    else
+      yt-dlp $video_params -o "$output_path"
+    fi
+
+    # clear
+    # dialog \
+    #   --yesno "Do you want to download the subtitle too(English)?" \
+    #   0 0
+    # if [ "$?" == 0 ]; then
+    #   withSubs="--write-sub --write-auto-sub"
+    #   #--sub-lang \"en.*\"
+    # else
+    #   withSubs=""
+    # fi
+    # clear
+    # yt-dlp ${withSubs} -c -i "$url" -o "$download_path/$file_name"
   elif [ "$result" == 2 ]; then
-    yt-dlp -x --audio-format "mp3" -c -i "$url" -o "$download_path/$file_name"
+    yt-dlp -x --audio-format "mp3" -c -i "$url" -o "$output_path"
   elif [ "$result" == 3 ]; then
     curl -sSL "$github_url/install.sh" | bash
     video_menu
