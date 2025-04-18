@@ -3,44 +3,46 @@
 url=$1
 github_url="https://github.com/andrewboy/termux-yt-dl/raw/main"
 download_path="$HOME/storage/downloads/youtube-dl"
-# download_path="$PWD"
+# download_path="$PWD/downloads"
 output_path="$download_path/%(title)s.%(ext)s"
 chapters_output_path="chapter:$download_path/%(title)s/[%(section_number)s] - %(section_title)s.%(ext)s"
 
 video_menu() {
   clear
 
-  local result=$(dialog \
+  menu_result=$(dialog \
   --clear \
   --stdout \
   --backtitle "Video Downloader" \
   --title "Video Downloader" \
   --menu "Choose:" \
-  10 40 4 \
+  11 40 4 \
   1 "download video" \
   2 "download audio" \
-  3 "update");
+  3 "download subtitle" \
+  4 "update");
 
-  local exitCode=$?
+  local menuExitCode=$?
 
   clear
 
-  [ "$exitCode" == 1 ] && exit 0
+  [ "$menuExitCode" == 1 ] && exit 0
 
   #create directory if not exists
-  [ ! -d "$download_path" ] && mkdir "$download_path"
+  [ ! -d "$download_path" ] && mkdir -p "$download_path"
 
-  if [ "$result" == 1 ]; then
-    local checklist_result=$(dialog \
+  if [ "$menu_result" == 1 ]; then
+    checklist_result=$(dialog \
       --checklist \
-      "Select choices" 0 0 2 \
-      a "With subtitle" off \
-      b "Split chapters" off \
-      --output-fd 1);
+      --stdout \
+      "Select choices" 8 40 2 \
+      a "Split chapters" off);
+
+    local checklistExitCode=$?
 
     clear
 
-    if [ "$?" == 1 ]; then
+    if [ "$checklistExitCode" == 1 ]; then
       video_menu
 
       return 1 # or return 0, or even you can omit the argument.
@@ -48,18 +50,12 @@ video_menu() {
 
     local video_params=" -c -i"
 
-    # echo $checklist_result
-
-    if [[ $checklist_result =~ "a" ]]; then
-      video_params+=" --write-sub --write-auto-sub"
-    fi
-
     video_params+=" $url"
 
-    if [[ $checklist_result =~ "b" ]]; then
+    if [[ $checklist_result =~ "a" ]]; then
       video_params+=" --split-chapters"
 
-      yt-dlp $video_params -o "$chapters_output_path"
+      yt-dlp $video_params -o "$chapters_output_path" --exec rm
     else
       yt-dlp $video_params -o "$output_path"
     fi
@@ -76,9 +72,22 @@ video_menu() {
     # fi
     # clear
     # yt-dlp ${withSubs} -c -i "$url" -o "$download_path/$file_name"
-  elif [ "$result" == 2 ]; then
-    yt-dlp -x --audio-format "mp3" -c -i "$url" -o "$output_path"
-  elif [ "$result" == 3 ]; then
+  elif [ "$menu_result" == 2 ]; then
+    yt-dlp \
+      -x \
+      --audio-format "mp3" \
+      -c \
+      -i "$url" \
+      -o "$output_path"
+  elif [ "$menu_result" == 3 ]; then
+    yt-dlp \
+      --skip-download \
+      --write-sub \
+      --write-auto-sub \
+      -c \
+      -i "$url" \
+      -o "$output_path"
+  elif [ "$menu_result" == 4 ]; then
     curl -sSL "$github_url/install.sh" | bash
     video_menu
   else
