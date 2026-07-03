@@ -2,8 +2,8 @@
 
 url=$1
 github_url="https://github.com/andrewboy/termux-yt-dl/raw/main"
-# download_path="$HOME/storage/downloads/youtube-dl"
-download_path="$PWD/downloads"
+download_path="$HOME/storage/downloads/youtube-dl"
+# download_path="$PWD/downloads"
 output_path="$download_path/%(title)s.%(ext)s"
 chapters_output_path="chapter:$download_path/%(title)s/[%(section_number)s] - %(section_title)s.%(ext)s"
 
@@ -16,7 +16,7 @@ video_menu() {
   --backtitle "Video Downloader" \
   --title "Video Downloader" \
   --menu "Choose:" \
-  11 40 4 \
+  12 40 4 \
   1 "download video" \
   2 "download audio" \
   3 "download subtitle" \
