@@ -2,8 +2,8 @@
 
 url=$1
 github_url="https://github.com/andrewboy/termux-yt-dl/raw/main"
-download_path="$HOME/storage/downloads/youtube-dl"
-# download_path="$PWD/downloads"
+# download_path="$HOME/storage/downloads/youtube-dl"
+download_path="$PWD/downloads"
 output_path="$download_path/%(title)s.%(ext)s"
 chapters_output_path="chapter:$download_path/%(title)s/[%(section_number)s] - %(section_title)s.%(ext)s"
 
@@ -20,7 +20,8 @@ video_menu() {
   1 "download video" \
   2 "download audio" \
   3 "download subtitle" \
-  4 "update");
+  4 "clip video" \
+  5 "update");
 
   local menuExitCode=$?
 
@@ -72,6 +73,7 @@ video_menu() {
     # fi
     # clear
     # yt-dlp ${withSubs} -c -i "$url" -o "$download_path/$file_name"
+
   elif [ "$menu_result" == 2 ]; then
     yt-dlp \
       -x \
@@ -79,6 +81,7 @@ video_menu() {
       -c \
       -i "$url" \
       -o "$output_path"
+
   elif [ "$menu_result" == 3 ]; then
     yt-dlp \
       --skip-download \
@@ -87,9 +90,22 @@ video_menu() {
       -c \
       -i "$url" \
       -o "$output_path"
+
   elif [ "$menu_result" == 4 ]; then
+    start_time=$(dialog --stdout \
+      --inputbox "Start time(H:i:s):" 8 40 "00:00:00")
+    end_time=$(dialog --stdout \
+      --inputbox "End time(H:i:s):" 8 40 "00:00:00")
+    yt-dlp \
+      --download-sections "*$start_time-$end_time" \
+      --force-keyframes-at-cuts \
+      -i "$url" \
+      -o "$output_path"
+
+  elif [ "$menu_result" == 5 ]; then
     curl -sSL "$github_url/install.sh" | bash
     video_menu
+
   else
     echo "Unrecognized choice"
   fi
