@@ -2,10 +2,14 @@
 
 url=$1
 github_url="https://github.com/andrewboy/termux-yt-dl/raw/main"
-download_path="$HOME/storage/downloads/youtube-dl"
-# download_path="$PWD/downloads"
-output_path="$download_path/%(title)s.%(ext)s"
-chapters_output_path="chapter:$download_path/%(title)s/[%(section_number)s] - %(section_title)s.%(ext)s"
+
+if [ -n "$TERMUX_VERSION" ]; then
+  download_path="$HOME/storage/downloads/youtube-dl"
+else
+  download_path="$PWD/downloads"
+fi
+output_path="$download_path/%(uploader,restrict)s - %(title,restrict)s.%(ext)s"
+chapters_output_path="chapter:$download_path/%(uploader,restrict)s - %(title,restrict)s/[%(section_number)s] - %(section_title,restrict)s.%(ext)s"
 
 video_menu() {
   clear
@@ -92,15 +96,15 @@ video_menu() {
       -o "$output_path"
 
   elif [ "$menu_result" == 4 ]; then
-    start_time=$(dialog --stdout \
-      --inputbox "Start time(H:i:s):" 8 40 "00:00:00")
-    end_time=$(dialog --stdout \
-      --inputbox "End time(H:i:s):" 8 40 "00:00:00")
+    from=$(dialog --stdout \
+      --inputbox "Time from(H:i:s):" 8 40 "00:00:00")
+    to=$(dialog --stdout \
+      --inputbox "Time to(H:i:s):" 8 40 "00:00:00")
     yt-dlp \
-      --download-sections "*$start_time-$end_time" \
+      --download-sections "*${from}-${to}" \
       --force-keyframes-at-cuts \
       -i "$url" \
-      -o "$output_path"
+      -o "$download_path/%(uploader,restrict)s - %(title,restrict)s - [${from}-${to}].%(ext)s"
 
   elif [ "$menu_result" == 5 ]; then
     curl -sSL "$github_url/install.sh" | bash
