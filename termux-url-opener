@@ -104,7 +104,7 @@ video_menu() {
       --download-sections "*${from}-${to}" \
       --force-keyframes-at-cuts \
       -i "$url" \
-      -o "$download_path/%(uploader,restrict)s - %(title,restrict)s - [${from}-${to}].%(ext)s"
+      -o "$download_path/%(uploader,restrict)s - %(title,restrict)s - [${from//:/.}-${to//:/.}].%(ext)s"
 
   elif [ "$menu_result" == 5 ]; then
     curl -sSL "$github_url/install.sh" | bash
