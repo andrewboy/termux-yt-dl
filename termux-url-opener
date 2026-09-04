@@ -60,9 +60,9 @@ video_menu() {
     if [[ $checklist_result =~ "a" ]]; then
       video_params+=" --split-chapters"
 
-      yt-dlp $video_params -o "$chapters_output_path" --exec rm
+      yt-dlp --js-runtimes deno $video_params -o "$chapters_output_path" --exec rm
     else
-      yt-dlp $video_params -o "$output_path"
+      yt-dlp --js-runtimes deno $video_params -o "$output_path"
     fi
 
     # clear
@@ -80,6 +80,7 @@ video_menu() {
 
   elif [ "$menu_result" == 2 ]; then
     yt-dlp \
+      --js-runtimes deno \
       -x \
       --audio-format "mp3" \
       -c \
@@ -88,6 +89,7 @@ video_menu() {
 
   elif [ "$menu_result" == 3 ]; then
     yt-dlp \
+      --js-runtimes deno \
       --skip-download \
       --write-sub \
       --write-auto-sub \
@@ -101,6 +103,7 @@ video_menu() {
     to=$(dialog --stdout \
       --inputbox "Time to(H:i:s):" 8 40 "00:00:00")
     yt-dlp \
+      --js-runtimes deno \
       --download-sections "*${from}-${to}" \
       --force-keyframes-at-cuts \
       -i "$url" \

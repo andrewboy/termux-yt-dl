@@ -26,7 +26,7 @@ yes | pkg upgrade
 # TERMUX URL OPENER ============================================================
 
 #Install dependencies
-pkg install curl python python-pip ffmpeg dialog -y
+pkg install curl python python-pip ffmpeg dialog deno -y
 yes | pip install -U yt-dlp curl_cffi
 
 #Install script
