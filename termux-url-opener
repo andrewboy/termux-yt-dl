@@ -60,9 +60,9 @@ video_menu() {
     if [[ $checklist_result =~ "a" ]]; then
       video_params+=" --split-chapters"
 
-      yt-dlp --js-runtimes deno $video_params -o "$chapters_output_path" --exec rm
+      yt-dlp --js-runtimes deno --remote-components ejs:github $video_params -o "$chapters_output_path" --exec rm
     else
-      yt-dlp --js-runtimes deno $video_params -o "$output_path"
+      yt-dlp --js-runtimes --remote-components ejs:github deno $video_params -o "$output_path"
     fi
 
     # clear
@@ -81,6 +81,7 @@ video_menu() {
   elif [ "$menu_result" == 2 ]; then
     yt-dlp \
       --js-runtimes deno \
+      --remote-components ejs:github \
       -x \
       --audio-format "mp3" \
       -c \
@@ -90,6 +91,7 @@ video_menu() {
   elif [ "$menu_result" == 3 ]; then
     yt-dlp \
       --js-runtimes deno \
+      --remote-components ejs:github \
       --skip-download \
       --write-sub \
       --write-auto-sub \
@@ -104,6 +106,7 @@ video_menu() {
       --inputbox "Time to(H:i:s):" 8 40 "00:00:00")
     yt-dlp \
       --js-runtimes deno \
+      --remote-components ejs:github \
       --download-sections "*${from}-${to}" \
       --force-keyframes-at-cuts \
       -i "$url" \
