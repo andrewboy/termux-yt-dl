@@ -62,7 +62,7 @@ video_menu() {
 
       yt-dlp --js-runtimes deno --remote-components ejs:github $video_params -o "$chapters_output_path" --exec rm
     else
-      yt-dlp --js-runtimes --remote-components ejs:github deno $video_params -o "$output_path"
+      yt-dlp --js-runtimes deno --remote-components ejs:github $video_params -o "$output_path"
     fi
 
     # clear
