@@ -37,32 +37,57 @@ video_menu() {
   [ ! -d "$download_path" ] && mkdir -p "$download_path"
 
   if [ "$menu_result" == 1 ]; then
-    checklist_result=$(dialog \
-      --checklist \
+    video_menu_result=$(dialog \
+      --clear \
       --stdout \
-      "Select choices" 8 40 2 \
-      a "Split chapters" off);
+      --backtitle "Video download options" \
+      --title "Video download options" \
+      --default-item "a" \
+      --menu "Choose:" \
+      12 40 4 \
+      a "No settings" \
+      b "Split chapters" \
+      c "Embed chapters");
 
-    local checklistExitCode=$?
+    local videoMenuExitCode=$?
 
     clear
 
-    if [ "$checklistExitCode" == 1 ]; then
+    if [ "$videoMenuExitCode" == 1 ]; then
       video_menu
 
       return 1 # or return 0, or even you can omit the argument.
     fi
 
-    local video_params=" -c -i"
-
-    video_params+=" $url"
-
-    if [[ $checklist_result =~ "a" ]]; then
-      video_params+=" --split-chapters"
-
-      yt-dlp --js-runtimes deno --remote-components ejs:github $video_params -o "$chapters_output_path" --exec rm
+    if [[ $video_menu_result =~ "a" ]]; then
+      yt-dlp \
+        --js-runtimes deno \
+        --remote-components ejs:github \
+        -c \
+        -i "$url" \
+        -o "$output_path"
+    elif [[ $video_menu_result =~ "b" ]]; then
+      yt-dlp \
+        --js-runtimes deno \
+        --remote-components ejs:github \
+        -c \
+        -i "$url" \
+        --split-chapters \
+        -o "$chapters_output_path" \
+        --exec rm
+    elif [[ $video_menu_result =~ "c" ]]; then
+      yt-dlp \
+        --js-runtimes deno \
+        --remote-components ejs:github \
+        --merge-output-format mkv \
+        --embed-chapters \
+        --embed-metadata \
+        --embed-thumbnail \
+        -c \
+        -i "$url" \
+        -o "$output_path"
     else
-      yt-dlp --js-runtimes deno --remote-components ejs:github $video_params -o "$output_path"
+      echo "Unrecognized choice"
     fi
 
     # clear
